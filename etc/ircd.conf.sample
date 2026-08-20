@@ -7,6 +7,14 @@
  * See https://chatnet.gg/routing.html for the full step-by-step guide.
  */
 
+/* Umode +W: notifies you when someone /WHOIS's you. Opt-in per user
+ * via /mode +W (auto-enabled for opers on /oper), not part of
+ * default_umodes. Excludes ChatNet's own service/bot nicks and
+ * staff-on-staff WHOIS (both sides checked via the "chatnet/staff/"
+ * cloak prefix) -- see extensions/cn_whois_notify.c for the full
+ * reasoning. Every ChatNet server carries this. */
+loadmodule "extensions/cn_whois_notify";
+
 serverinfo {
 	name = "<<-- your-assigned-name.chatnet.gg -->>";
 	sid = "<<-- SID given to you by the ChatNet admin, e.g. 43B -->>";

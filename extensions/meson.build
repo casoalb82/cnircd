@@ -10,6 +10,7 @@ extension_modules = [
   'chm_operpeace',
   'chm_regmsg',
   'chm_sslonly',
+  'cn_whois_notify',
   'createauthonly',
   'createoperonly',
   'drain',
