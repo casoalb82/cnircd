@@ -1,0 +1,39 @@
+name: Sync upstream Solanum
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'  # 1st of every month, 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "sh"
+          git config user.email "abcx@chatnet.gg"
+
+      - name: Attempt rebase onto upstream Solanum
+        run: |
+          chmod +x sync-upstream.sh
+          ./sync-upstream.sh
+
+      - name: Push rebased branch and open/update PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git push --force-with-lease origin HEAD:upstream-sync
+          if ! gh pr list --head upstream-sync --json number --jq '.[0].number' | grep -q .; then
+            gh pr create \
+              --head upstream-sync \
+              --title "Sync: rebase ChatNet patches onto latest Solanum" \
+              --body "Automated monthly rebase of ChatNet's patches (see README.chatnet.md) onto the latest upstream Solanum. Review the diff, make sure cnircd still builds (meson setup build && meson compile -C build), then merge."
