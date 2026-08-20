@@ -1,6 +1,7 @@
 extension_modules = [
   'cap_oper',
   'cap_realhost',
+  'cap_sts',
   'chantype_dummy',
   'chm_adminonly',
   'chm_operonly',
