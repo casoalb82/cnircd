@@ -19,9 +19,9 @@ git fetch upstream
 
 BASE=$(git rev-parse "${FIRST_CHATNET_COMMIT}^")
 echo "Current base: $BASE"
-echo "Rebasing ChatNet patches onto upstream/master..."
+echo "Rebasing ChatNet patches onto upstream/main..."
 
-git rebase --onto upstream/master "$BASE"
+git rebase --onto upstream/main "$BASE"
 
 echo
 echo "Done. Review with 'git log --oneline' and 'git diff origin/main', then:"
