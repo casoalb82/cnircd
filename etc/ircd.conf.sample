@@ -15,6 +15,13 @@
  * reasoning. Every ChatNet server carries this. */
 loadmodule "extensions/cn_whois_notify";
 
+/* Per-user anonymous IP/host cloak, "CN-" branded (see
+ * extensions/cn_ip_cloak.c) -- enabled by default for everyone via
+ * default_umodes below ("+ix"). Registered+identified NickServ
+ * accounts get their own "user/<account>" cloak instead, overwritten
+ * on IDENTIFY/SASL regardless of this module. */
+loadmodule "extensions/cn_ip_cloak";
+
 serverinfo {
 	name = "<<-- your-assigned-name.chatnet.gg -->>";
 	sid = "<<-- SID given to you by the ChatNet admin, e.g. 43B -->>";
@@ -231,7 +238,7 @@ serverhide {
 general {
 	hide_error_messages = opers;
 	hide_spoof_ips = yes;
-	default_umodes = "+i";
+	default_umodes = "+ix";
 	default_operstring = "is an IRC Operator";
 	default_adminstring = "is a Server Administrator";
 	servicestring = "is a Network Service";
