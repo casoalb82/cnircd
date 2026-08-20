@@ -34,6 +34,14 @@ just the ircd itself.
    revert this one if your network doesn't want that behavior --
    grant `auspex:cmodes` to every oper privset to get full visibility
    back with zero source changes.
+4. **Hide service bots from `/STATS p`** -- ChatNet-specific. Stock
+   `stats_operedup()` (`modules/m_stats.c`) lists every currently-opered
+   client network-wide, which includes pseudoclient bots (e.g. cncheck,
+   vhost `chatnet/bot/*`) alongside real staff. Skips any opered client
+   whose displayed host matches `chatnet/bot*` before it's counted or
+   printed, so `/STATS p` shows real staff, not bots. Harmless to keep
+   even if your network has no bots under that vhost pattern -- it's
+   simply never a match.
 
 Each patch is its own commit with a full explanation in the commit
 message -- `git log` for the details, this file is just the index.
@@ -60,7 +68,7 @@ upstream shipped its own proper fix for the same `__DATE__` placeholder
 issue (see commit history around 2026-08-20's sync). Always check
 *why* a patch no longer applies, not just whether it does.
 
-## ChatNet Coders
+## ChatNet Development
 
 - **sh** (abcx@chatnet.gg) -- maintainer
 
