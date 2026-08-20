@@ -62,14 +62,40 @@ class "server" {
 	sendq = 4 megabytes;
 };
 
-/* Every server in the network runs this -- checks connecting users
- * against a public DNSBL of known open proxies/compromised hosts.
+/* Every server in the network runs these -- check connecting users
+ * against public DNSBLs of known open proxies/compromised hosts.
  * Only relevant if your server accepts real users directly (see the
- * listen{} block below); omit along with that if it doesn't. */
+ * listen{} block below); omit along with opm{} below if it doesn't. */
 dnsbl {
 	host = "rbl.efnetrbl.org";
 	type = ipv4;
 	reject_reason = "Your IP is listed in EFnet's RBL as an open proxy or compromised host. If this is a mistake, see http://efnetrbl.org/ or contact the ChatNet admin.";
+};
+
+/* Spamhaus ZEN -- catches spam sources EFnet's RBL alone misses.
+ * matches excludes PBL (10, 11): that zone just flags dynamic/
+ * residential IP ranges, not actual abuse, and would false-positive
+ * on plenty of real users' home connections. */
+dnsbl {
+	host = "zen.spamhaus.org";
+	type = ipv4;
+	matches = "2", "3", "4", "5", "6", "7";
+	reject_reason = "Your IP is listed in Spamhaus ZEN as a known spam source or compromised host. If this is a mistake, see https://www.spamhaus.org/lookup/ or contact the ChatNet admin.";
+};
+
+/* Open-proxy scanning (OPM) -- unlike the dnsbl{} blocks above (passive
+ * lookups), this actively connects OUT to every connecting client's
+ * common proxy ports and asks it to relay a connection back to you on
+ * listen_port below, so it needs a real publicly-reachable port on
+ * YOUR server (open it in your firewall). No listen_ipv4/ipv6 given --
+ * binds all interfaces by default, same as the listen{} block below. */
+opm {
+	listen_port = 32000;
+	timeout = 5;
+	socks4_ports = 1080, 10800, 443, 80, 8080, 8000;
+	socks5_ports = 1080, 10800, 443, 80, 8080, 8000;
+	httpconnect_ports = 80, 8080, 8000;
+	httpsconnect_ports = 443, 4443;
 };
 
 /* Only needed if you want real users connecting directly to YOUR
