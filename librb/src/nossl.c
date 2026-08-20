@@ -57,7 +57,6 @@ rb_ssl_listen(rb_fde_t *F __attribute__((unused)), int backlog __attribute__((un
 static void
 rb_stir_arc4random(void *unused __attribute__((unused)))
 {
-	arc4random_stir();
 }
 
 
@@ -65,7 +64,6 @@ int
 rb_init_prng(const char *path __attribute__((unused)), prng_seed_t seed_type __attribute__((unused)))
 {
 	/* xxx this ignores the parameters above */
-	arc4random_stir();
 	rb_event_addish("rb_stir_arc4random", rb_stir_arc4random, NULL, 300);
 	return 1;
 }
