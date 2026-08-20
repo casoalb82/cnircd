@@ -26,10 +26,7 @@ just the ircd itself.
    the unsupported probe rather than fixing it generally -- if you
    need real dual-stack nameserver validation, don't cherry-pick this
    one.
-3. **Real build date** instead of the literal `__DATE__ at __TIME__`
-   placeholder in `/VERSION` and the 003 numeric (upstream's meson
-   build never ported the old autotools path's actual `date` call).
-4. **Hide channel mode `+P` from `MODE` queries** -- ChatNet-specific.
+3. **Hide channel mode `+P` from `MODE` queries** -- ChatNet-specific.
    `+P` marks a channel as permanent (survives its last member
    parting) for services-side use; this keeps that mechanism intact
    but stops it from showing up in a regular `/mode #chan` unless the
@@ -51,10 +48,17 @@ of memory and segfaults at startup. Cap it explicitly (ChatNet uses
 
 ## Staying in sync with upstream
 
-This fork does not track upstream Solanum automatically. If you want
-newer upstream fixes, rebase this branch's 4 commits onto whatever
-upstream commit you want and re-verify each patch still applies
-cleanly.
+Run `./sync-upstream.sh` to rebase these patches onto the latest
+upstream Solanum -- it stops for you to resolve by hand if a patch no
+longer applies cleanly. A GitHub Action can also run this on a
+schedule and open a PR automatically; see the repo settings if one
+isn't already configured.
+
+Note that a patch can become obsolete rather than conflict -- e.g. the
+original "real build date" patch here was dropped entirely once
+upstream shipped its own proper fix for the same `__DATE__` placeholder
+issue (see commit history around 2026-08-20's sync). Always check
+*why* a patch no longer applies, not just whether it does.
 
 ## ChatNet Coders
 
