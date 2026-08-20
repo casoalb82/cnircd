@@ -55,3 +55,15 @@ This fork does not track upstream Solanum automatically. If you want
 newer upstream fixes, rebase this branch's 4 commits onto whatever
 upstream commit you want and re-verify each patch still applies
 cleanly.
+
+## ChatNet Coders
+
+- **sh** (abcx@chatnet.gg) -- maintainer
+
+Thanks to the ChatNet staff for testing these patches on real linked
+leaves before they landed here:
+
+- **w0od** (w0od@chatnet.gg)
+- **TGS** (tgs@chatnet.gg)
+- **Astro** (astro@chatnet.gg)
+- **Slogan** (slogan@chatnet.gg)

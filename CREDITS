@@ -26,3 +26,21 @@ is in doc/credits-past.txt.
 
 Visit the Solanum website at: https://solanum.chat/
 Visit us on IRC at: irc.libera.chat #solanum
+
+This build, cnircd, is ChatNet's own fork for linking servers into
+the network -- see https://chatnet.gg/
+
+ChatNet Coders:
+
+sh <abcx@chatnet.gg>
+
+Thanks to the ChatNet staff for testing these patches on real linked
+leaves before they landed here:
+
+w0od <w0od@chatnet.gg>
+TGS <tgs@chatnet.gg>
+Astro <astro@chatnet.gg>
+Slogan <slogan@chatnet.gg>
+
+Visit ChatNet at: https://chatnet.gg/
+Visit us on IRC at: irc.chatnet.gg #chatnet

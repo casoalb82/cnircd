@@ -1,0 +1,265 @@
+/*
+ * ChatNet -- template ircd.conf for linking your own Solanum server
+ * into the network as a leaf. Fill in the <<-- ... --> placeholders
+ * (the SID/host/password you were given by the ChatNet admin, plus
+ * your own local server details) and nothing else needs to change.
+ *
+ * See https://chatnet.gg/routing.html for the full step-by-step guide.
+ */
+
+serverinfo {
+	name = "<<-- your-assigned-name.chatnet.gg -->>";
+	sid = "<<-- SID given to you by the ChatNet admin, e.g. 43B -->>";
+	description = "<<-- short description of your server -->>";
+	network_name = "ChatNet";
+	default_max_clients = 1024;
+	nicklen = 30;
+
+	/* Required even without real TLS listeners -- without a cert file
+	 * present, solanum's ssld helper aborts startup on some builds. */
+	ssl_cert = "etc/ssl.pem";
+	ssl_dh_params = "etc/dh.pem";
+	ssld_count = 1;
+};
+
+admin {
+	name = "<<-- your name/handle -->>";
+	description = "<<-- your server's description -->>";
+	email = "<<-- your contact email -->>";
+};
+
+log {
+	fname_userlog = "logs/userlog";
+	fname_operlog = "logs/operlog";
+	fname_serverlog = "logs/serverlog";
+	fname_killlog = "logs/killlog";
+	fname_operspylog = "logs/operspylog";
+};
+
+class "users" {
+	ping_time = 2 minutes;
+	number_per_ident = 10;
+	number_per_ip = 10;
+	number_per_ip_global = 50;
+	cidr_ipv4_bitlen = 24;
+	cidr_ipv6_bitlen = 64;
+	number_per_cidr = 200;
+	max_number = 3000;
+	sendq = 400 kbytes;
+};
+
+class "opers" {
+	ping_time = 5 minutes;
+	number_per_ip = 10;
+	max_number = 1000;
+	sendq = 1 megabyte;
+};
+
+class "server" {
+	ping_time = 5 minutes;
+	connectfreq = 5 minutes;
+	max_number = 1;
+	sendq = 4 megabytes;
+};
+
+/* Every server in the network runs this -- checks connecting users
+ * against a public DNSBL of known open proxies/compromised hosts.
+ * Only relevant if your server accepts real users directly (see the
+ * listen{} block below); omit along with that if it doesn't. */
+dnsbl {
+	host = "rbl.efnetrbl.org";
+	type = ipv4;
+	reject_reason = "Your IP is listed in EFnet's RBL as an open proxy or compromised host. If this is a mistake, see http://efnetrbl.org/ or contact the ChatNet admin.";
+};
+
+/* Only needed if you want real users connecting directly to YOUR
+ * server. Omit entirely if this leaf only exists to extend the
+ * network topology, with no local users. */
+listen {
+	defer_accept = yes;
+	port = 6667;
+};
+
+auth {
+	user = "*@*";
+	class = "users";
+	flags = exceed_limit;
+};
+
+/* ChatNet's public entry point, irc.chatnet.gg -- NOT the network's
+ * internal hub. Your server dials OUT to it (flags = autoconn), it
+ * only accepts the connection. */
+connect "irc.chatnet.gg" {
+	host = "<<-- irc.chatnet.gg's public IP, given to you by the ChatNet admin -->>";
+	send_password = "<<-- password given to you by the ChatNet admin -->>";
+	accept_password = "<<-- same password -->>";
+	port = 7000;
+	class = "server";
+	flags = autoconn;
+};
+
+/* Marks ChatNet's own services (K9/NickServ/etc) as a trusted network
+ * service on YOUR server too. Every server in the network must
+ * declare this identically. */
+service {
+	name = "services.chatnet.gg";
+};
+
+/* Same short command aliases as the rest of the network. No "ChanServ"
+ * or "OperServ" alias, deliberately -- the real nicks are "K9" and "OS". */
+alias "NickServ" { target = "NickServ"; };
+alias "MemoServ" { target = "MemoServ"; };
+alias "GroupServ" { target = "GroupServ"; };
+alias "HostServ" { target = "HostServ"; };
+alias "BotServ" { target = "BotServ"; };
+alias "InfoServ" { target = "InfoServ"; };
+alias "NS" { target = "NickServ"; };
+alias "CS" { target = "K9"; };
+alias "K9" { target = "K9"; };
+alias "OS" { target = "OS"; };
+alias "MS" { target = "MemoServ"; };
+alias "GS" { target = "GroupServ"; };
+alias "HS" { target = "HostServ"; };
+alias "BS" { target = "BotServ"; };
+alias "ChatWorld" { target = "ChatWorld"; };
+alias "CW" { target = "ChatWorld"; };
+
+/* Every ChatNet service nick (NickServ/K9/OS/ChatWorld/etc) is under a
+ * permanent, network-wide RESV -- it's set once on any linked server and
+ * propagates to every other server on burst, including yours the moment
+ * you link in. Don't try to add your own local resv{} for these; there's
+ * no such static block in Solanum, and it would just be redundant with
+ * what's already enforced network-wide. */
+
+/* ROUTING O:lines -- requested on every server that links into
+ * ChatNet, purely for network routing purposes (so our admins can
+ * oper up on any linked server if a link needs to be fixed, squit,
+ * or rerouted). Local to your server only per Solanum's own model --
+ * does not grant anything on the rest of ChatNet by itself. Keep
+ * these exactly as given; they're the same on every leaf network-wide. */
+operator "admin" {
+	user = "*@*";
+	password = "$6$NK5UPD6ilyStXnwz$TpP8D7kpbn1/1NqVsGe0T9zpog6eV9ach0Dbt1p5dIs41YKMMqBGe5CoA573Tusajjpb2hI.99S0pAAflBHUj1";
+	flags = encrypted;
+	privset = "admin";
+};
+
+operator "w0od" {
+	user = "*@*";
+	password = "$6$V7c4I3tCdwFfNxKc$SYqIR7hcBx3pnDn/7D0PbSI.EMfi3ceFV3.STiE2QKmNpPT.jXEidAl7hdmsfSCt/JKIZT2p.I.ou5t/dsjMn/";
+	flags = encrypted;
+	privset = "admin";
+};
+
+/* Local IRCop on YOUR server only -- grants nothing network-wide.
+ * Pick your own password, not shared with the ChatNet admin. */
+operator "<<-- your local oper name -->>" {
+	user = "*@*";
+	password = "<<-- choose your own password -->>";
+	flags = ~encrypted;
+};
+
+privset "admin" {
+	privs = oper:general, oper:privs, oper:testline, oper:kill, oper:operwall, oper:message,
+		usermode:servnotice, auspex:oper, auspex:hostname, auspex:umodes, auspex:cmodes,
+		oper:routing, oper:kline, oper:unkline, oper:xline, oper:resv, oper:cmodes,
+		oper:mass_notice, oper:wallops, oper:remoteban, oper:admin, oper:die, oper:rehash,
+		oper:spy, oper:grant;
+};
+
+/* Copied verbatim from the network -- keep these identical so
+ * channel/nick behavior feels consistent regardless of which server
+ * a user happens to be connected to. */
+channel {
+	use_invex = yes;
+	use_except = yes;
+	use_forward = yes;
+	use_knock = yes;
+	knock_delay = 5 minutes;
+	knock_delay_channel = 1 minute;
+	max_chans_per_user = 15;
+	max_bans = 100;
+	default_split_user_count = 0;
+	default_split_server_count = 0;
+	no_create_on_split = no;
+	no_join_on_split = no;
+	burst_topicwho = yes;
+	autochanmodes = "+nt";
+};
+
+serverhide {
+	flatten_links = yes;
+	links_delay = 5 minutes;
+	hidden = no;
+	disable_hidden = no;
+};
+
+general {
+	hide_error_messages = opers;
+	hide_spoof_ips = yes;
+	default_umodes = "+i";
+	default_operstring = "is an IRC Operator";
+	default_adminstring = "is a Server Administrator";
+	servicestring = "is a Network Service";
+	sasl_service = "SaslServ";
+	disable_fake_channels = no;
+	tkline_expire_notices = no;
+	default_floodcount = 10;
+	failed_oper_notice = yes;
+	dots_in_ident = 2;
+	min_nonwildcard = 4;
+	min_nonwildcard_simple = 3;
+	max_accept = 100;
+	max_monitor = 100;
+	anti_nick_flood = yes;
+	max_nick_time = 20 seconds;
+	max_nick_changes = 5;
+	anti_spam_exit_message_time = 5 minutes;
+	ts_warn_delta = 30 seconds;
+	ts_max_delta = 5 minutes;
+	client_exit = yes;
+	collision_fnc = yes;
+	resv_fnc = yes;
+	global_snotices = yes;
+	dline_with_reason = yes;
+	kline_with_reason = yes;
+	kline_reason = "K-Lined";
+	identify_service = "NickServ@services.chatnet.gg";
+	identify_command = "IDENTIFY";
+	non_redundant_klines = yes;
+	warn_no_nline = yes;
+	use_propagated_bans = yes;
+	stats_o_oper_only = yes;
+	stats_i_oper_only = masked;
+	stats_k_oper_only = masked;
+	map_oper_only = yes;
+	caller_id_wait = 1 minute;
+	pace_wait_simple = 1 second;
+	pace_wait = 10 seconds;
+	short_motd = no;
+	ping_cookie = no;
+	connect_timeout = 30 seconds;
+	default_ident_timeout = 5;
+	disable_auth = no;
+	no_oper_flood = yes;
+	max_targets = 4;
+	client_flood_max_lines = 20;
+	oper_only_umodes = operwall, servnotice;
+	oper_umodes = servnotice, operwall, wallop;
+	oper_snomask = "+s";
+	burst_away = yes;
+	nick_delay = 0 seconds;
+	reject_ban_time = 1 minute;
+	reject_after_count = 3;
+	reject_duration = 5 minutes;
+	throttle_duration = 60;
+	throttle_count = 4;
+	max_ratelimit_tokens = 30;
+	away_interval = 30;
+	hide_opers_in_whois = no;
+};
+
+modules {
+	path = "modules";
+	path = "modules/autoload";
+};
