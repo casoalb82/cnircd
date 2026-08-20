@@ -226,7 +226,7 @@ add_nameserver(const char *arg)
     return;
 
   memset(&hints, 0, sizeof(hints));
-  hints.ai_family   = PF_UNSPEC;
+  hints.ai_family   = PF_INET;
   hints.ai_socktype = SOCK_DGRAM;
   hints.ai_flags    = AI_PASSIVE | AI_NUMERICHOST;
 
