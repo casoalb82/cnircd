@@ -803,6 +803,9 @@ stats_operedup (struct Client *source_p)
 	{
 		target_p = oper_ptr->data;
 
+		if (match("chatnet/bot*", target_p->host))
+			continue;
+
 		if(!SeesOper(target_p, source_p))
 			continue;
 
