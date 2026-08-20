@@ -13,6 +13,16 @@
  * extensions/cap_sts.c. */
 loadmodule "extensions/cap_sts";
 
+/* IRCv3 invite-notify -- stock solanum extension, already compiled by
+ * default, just never loaded by default. echo-message needs no such
+ * line -- it's core, not an extension, always-on. */
+loadmodule "extensions/invite_notify";
+
+/* Channel mode +O -- makes a channel oper-only: anyone who isn't an
+ * IRC operator gets rejected on JOIN with numeric 520. Stock solanum
+ * extension, only an oper can set/unset +O itself. */
+loadmodule "extensions/chm_operonly";
+
 /* Umode +W: notifies you when someone /WHOIS's you. Opt-in per user
  * via /mode +W (auto-enabled for opers on /oper), not part of
  * default_umodes. Excludes ChatNet's own service/bot nicks and
